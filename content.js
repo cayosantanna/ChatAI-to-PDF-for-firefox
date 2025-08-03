@@ -12,11 +12,37 @@ class AdvancedAIChatPDFExporter {
   }
 
   setupMessageListener() {
-    browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
-      if (message.action === 'exportToPDF') {
-        this.exportToPDF(message.hostname);
-        sendResponse({ success: true });
+    browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
+      try {
+        console.log('Content script recebeu mensagem:', message);
+        
+        if (message.action === 'exportToPDF' || message.action === 'quickCapture') {
+          console.log('Iniciando captura de conteúdo...');
+          const result = await this.exportToPDF(message.hostname || window.location.hostname, message.mode || 'smart');
+          sendResponse({ success: true, message: 'Conteúdo capturado com sucesso', data: result });
+        } else if (message.action === 'advancedCapture') {
+          console.log('Iniciando captura avançada...');
+          await this.showSelectionInterface();
+          sendResponse({ success: true, message: 'Interface de seleção ativada' });
+        } else if (message.action === 'toggleSidebar') {
+          this.toggleSelectionSidebar();
+          sendResponse({ success: true });
+        } else if (message.action === 'getPageInfo') {
+          const info = await this.getPageInfo();
+          sendResponse({ success: true, data: info });
+        } else {
+          console.log('Ação não reconhecida:', message.action);
+          sendResponse({ success: false, error: 'Ação não reconhecida: ' + message.action });
+        }
+      } catch (error) {
+        console.error('Erro no content script:', error);
+        sendResponse({ 
+          success: false, 
+          error: error.message || 'Erro desconhecido ao processar conteúdo'
+        });
       }
+      
+      return true; // Mantém o canal aberto para resposta assíncrona
     });
   }
 
@@ -49,471 +75,403 @@ class AdvancedAIChatPDFExporter {
         border-radius: 4px;
         z-index: 10000;
         cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
-      .pdf-exporter-checkbox.checked {
-        background: #10b981;
-        border-color: #10b981;
-      }
-      .pdf-exporter-checkbox.checked::after {
-        content: '✓';
-        color: white;
-        font-size: 14px;
-        position: absolute;
-        top: -2px;
-        left: 3px;
-      }
-      .pdf-exporter-toolbar {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: white;
-        border: 1px solid #e5e7eb;
-        border-radius: 8px;
-        padding: 15px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        z-index: 10001;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        min-width: 250px;
-        display: none;
-      }
-      .pdf-exporter-toolbar button {
+      .pdf-exporter-checkbox.selected {
         background: #3b82f6;
         color: white;
-        border: none;
-        padding: 8px 16px;
-        margin: 4px 2px;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 14px;
       }
-      .pdf-exporter-toolbar button:hover {
-        background: #2563eb;
-      }
-      .pdf-exporter-toolbar button.secondary {
-        background: #6b7280;
-      }
-      .pdf-exporter-toolbar button.secondary:hover {
-        background: #4b5563;
+      .pdf-exporter-sidebar {
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 300px;
+        height: 100vh;
+        background: white;
+        border-left: 2px solid #e5e7eb;
+        z-index: 10001;
+        padding: 20px;
+        overflow-y: auto;
+        box-shadow: -5px 0 15px rgba(0,0,0,0.1);
       }
     `;
-    document.head.appendChild(style);
-  }
-
-  getElementsForSite(hostname) {
-    this.elements = [];
-    this.csp = false;
-
-    switch (hostname) {
-      case 'claude.ai':
-        // Mensagens individuais
-        const claudeMessages = document.querySelectorAll('div[data-test-render-count]');
-        claudeMessages.forEach(msg => {
-          if (msg && msg.parentElement) this.elements.push(msg.parentElement);
-        });
-        
-        // Artifacts
-        const claudeArtifacts = document.querySelector('div.ease-out.w-full[class*="overflow-"]');
-        if (claudeArtifacts) this.elements.push(claudeArtifacts);
-        break;
-
-      case 'chatgpt.com':
-        // Mensagens individuais
-        const chatgptMessages = document.querySelectorAll('article');
-        chatgptMessages.forEach(msg => {
-          if (msg && msg.parentElement) this.elements.push(msg.parentElement);
-        });
-        
-        // Canvas
-        const chatgptCanvas = document.querySelector('section.popover>main');
-        if (chatgptCanvas) this.elements.push(chatgptCanvas);
-        
-        this.csp = true;
-        break;
-
-      case 'grok.com':
-        // Mensagens individuais
-        const grokMessages = document.querySelectorAll('div[class*="message"]');
-        grokMessages.forEach(msg => this.elements.push(msg));
-        
-        // Thoughts
-        const grokThoughts = document.querySelector('aside');
-        if (grokThoughts) this.elements.push(grokThoughts);
-        break;
-
-      case 'gemini.google.com':
-        // Mensagens individuais  
-        const geminiMessages = document.querySelectorAll('message-content');
-        geminiMessages.forEach(msg => this.elements.push(msg));
-        
-        // Extended responses
-        const geminiExtended = document.querySelector('extended-response-panel response-container');
-        if (geminiExtended) this.elements.push(geminiExtended);
-        
-        this.csp = true;
-        break;
-
-      case 'www.notion.so':
-        // Blocos de conteúdo do Notion
-        const notionBlocks = document.querySelectorAll('[data-block-id]');
-        notionBlocks.forEach(block => this.elements.push(block));
-        
-        // Página principal
-        const notionPage = document.querySelector('[role="main"]');
-        if (notionPage) this.elements.push(notionPage);
-        break;
-
-      default:
-        console.error(`${hostname} não é suportado`);
-        return false;
-    }
-
-    console.debug(`Elementos encontrados em ${hostname}:`, this.elements);
-    this.elements = this.elements.filter(n => n);
-    return this.elements.length > 0;
-  }
-
-  showSelectionInterface() {
-    // Remove interface anterior se existir
-    const existingToolbar = document.getElementById('pdf-exporter-toolbar');
-    if (existingToolbar) existingToolbar.remove();
-
-    // Adiciona checkboxes aos elementos
-    this.elements.forEach((element, index) => {
-      element.classList.add('pdf-exporter-selectable');
-      element.dataset.pdfExporterIndex = index;
-      
-      const checkbox = document.createElement('div');
-      checkbox.className = 'pdf-exporter-checkbox';
-      checkbox.dataset.index = index;
-      
-      checkbox.addEventListener('click', (e) => {
-        e.stopPropagation();
-        this.toggleElementSelection(index, checkbox);
-      });
-      
-      element.appendChild(checkbox);
-      
-      // Adiciona click no elemento
-      element.addEventListener('click', (e) => {
-        if (!e.target.classList.contains('pdf-exporter-checkbox')) {
-          this.toggleElementSelection(index, checkbox);
-        }
-      });
-    });
-
-    // Cria toolbar
-    const toolbar = document.createElement('div');
-    toolbar.id = 'pdf-exporter-toolbar';
-    toolbar.className = 'pdf-exporter-toolbar';
-    toolbar.style.display = 'block';
     
-    toolbar.innerHTML = `
-      <h3 style="margin: 0 0 10px 0; font-size: 16px; color: #1f2937;">Exportar para PDF</h3>
-      <p style="margin: 0 0 15px 0; font-size: 14px; color: #6b7280;">Clique nos elementos para selecioná-los</p>
-      
-      <div style="margin-bottom: 15px;">
-        <button id="select-all-btn">Selecionar Tudo</button>
-        <button id="select-none-btn" class="secondary">Desmarcar Tudo</button>
-      </div>
-      
-      <div style="margin-bottom: 15px;">
-        <label style="display: block; margin-bottom: 5px; font-size: 14px;">
-          <input type="checkbox" id="include-images-cb" checked> Incluir imagens
-        </label>
-        <label style="display: block; margin-bottom: 5px; font-size: 14px;">
-          <input type="checkbox" id="remove-headers-cb" checked> Remover cabeçalhos/rodapés
-        </label>
-      </div>
-      
-      <div style="margin-bottom: 15px;">
-        <button id="open-editor-btn" style="background: #10b981;">Abrir Editor</button>
-        <button id="direct-export-btn">Exportar Direto</button>
-      </div>
-      
-      <button id="cancel-btn" class="secondary">Cancelar</button>
-    `;
-
-    document.body.appendChild(toolbar);
-
-    // Event listeners para toolbar
-    document.getElementById('select-all-btn').addEventListener('click', () => this.selectAllElements());
-    document.getElementById('select-none-btn').addEventListener('click', () => this.selectNoElements());
-    document.getElementById('open-editor-btn').addEventListener('click', () => this.openEditor());
-    document.getElementById('direct-export-btn').addEventListener('click', () => this.directExport());
-    document.getElementById('cancel-btn').addEventListener('click', () => this.hideSelectionInterface());
-  }
-
-  toggleElementSelection(index, checkbox) {
-    if (this.selectedElements.has(index)) {
-      this.selectedElements.delete(index);
-      checkbox.classList.remove('checked');
-      this.elements[index].classList.remove('pdf-exporter-selected');
-    } else {
-      this.selectedElements.add(index);
-      checkbox.classList.add('checked');
-      this.elements[index].classList.add('pdf-exporter-selected');
+    if (!document.getElementById('pdf-exporter-styles')) {
+      document.head.appendChild(style);
     }
   }
 
-  selectAllElements() {
-    this.elements.forEach((element, index) => {
-      this.selectedElements.add(index);
-      const checkbox = element.querySelector('.pdf-exporter-checkbox');
-      if (checkbox) {
-        checkbox.classList.add('checked');
-        element.classList.add('pdf-exporter-selected');
-      }
-    });
-  }
-
-  selectNoElements() {
-    this.selectedElements.clear();
-    this.elements.forEach((element, index) => {
-      const checkbox = element.querySelector('.pdf-exporter-checkbox');
-      if (checkbox) {
-        checkbox.classList.remove('checked');
-        element.classList.remove('pdf-exporter-selected');
-      }
-    });
-  }
-
-  hideSelectionInterface() {
-    // Remove checkboxes e classes
-    this.elements.forEach(element => {
-      element.classList.remove('pdf-exporter-selectable', 'pdf-exporter-selected');
-      const checkbox = element.querySelector('.pdf-exporter-checkbox');
-      if (checkbox) checkbox.remove();
+  async exportToPDF(hostname, mode = 'smart') {
+    try {
+      console.log('Exportando PDF para:', hostname, 'modo:', mode);
       
-      // Remove event listeners clonando elemento
-      const newElement = element.cloneNode(true);
-      element.parentNode.replaceChild(newElement, element);
-    });
+      // Detecta plataforma
+      const platform = this.detectPlatform(hostname);
+      console.log('Plataforma detectada:', platform);
+      
+      // Encontra elementos baseado na plataforma
+      this.findElements(platform);
+      console.log('Elementos encontrados:', this.elements.length);
+      
+      if (this.elements.length === 0) {
+        throw new Error('Nenhum conteúdo de conversa encontrado nesta página');
+      }
+      
+      // Extrai imagens
+      await this.extractImages();
+      console.log('Imagens extraídas:', this.images.length);
+      
+      // Verifica CSP
+      this.checkCSP();
+      
+      // Gera PDF baseado no modo
+      if (mode === 'smart' || this.csp) {
+        await this.generatePDFNative();
+      } else {
+        await this.generatePDFAdvanced();
+      }
+      
+      return {
+        elementsFound: this.elements.length,
+        imagesFound: this.images.length,
+        platform: platform,
+        cspRestricted: this.csp
+      };
+      
+    } catch (error) {
+      console.error('Erro na exportação:', error);
+      throw error;
+    }
+  }
 
-    // Remove toolbar
-    const toolbar = document.getElementById('pdf-exporter-toolbar');
-    if (toolbar) toolbar.remove();
+  detectPlatform(hostname) {
+    if (hostname.includes('claude.ai')) return 'claude';
+    if (hostname.includes('chatgpt.com')) return 'chatgpt';
+    if (hostname.includes('grok.com')) return 'grok';
+    if (hostname.includes('gemini.google.com')) return 'gemini';
+    if (hostname.includes('notion.so')) return 'notion';
+    return 'generic';
+  }
 
-    this.selectedElements.clear();
+  findElements(platform) {
+    this.elements = [];
+    
+    const selectors = {
+      claude: [
+        '[data-testid="conversation"] [data-testid="message"]',
+        '.conversation-content .message',
+        '[role="main"] .prose'
+      ],
+      chatgpt: [
+        '[data-testid="conversation-turn"]',
+        '.conversation-content > div',
+        '[role="presentation"] .group'
+      ],
+      grok: [
+        '.message-container',
+        '.conversation .message',
+        '[data-testid="message"]'
+      ],
+      gemini: [
+        '.conversation-container .message',
+        '[data-testid="conversation"] > div',
+        '.model-response'
+      ],
+      notion: [
+        '[data-block-id]',
+        '.notion-page-content',
+        '.notion-selectable'
+      ],
+      generic: [
+        'article',
+        '.content',
+        'main',
+        '[role="main"]',
+        '.post',
+        '.entry-content'
+      ]
+    };
+
+    const platformSelectors = selectors[platform] || selectors.generic;
+    
+    for (const selector of platformSelectors) {
+      const found = document.querySelectorAll(selector);
+      if (found.length > 0) {
+        this.elements = Array.from(found);
+        console.log(`Encontrados ${found.length} elementos com seletor: ${selector}`);
+        break;
+      }
+    }
   }
 
   async extractImages() {
     this.images = [];
-    const selectedElementsList = Array.from(this.selectedElements).map(i => this.elements[i]);
+    const imgs = document.querySelectorAll('img[src]');
     
-    for (const element of selectedElementsList) {
-      const imgs = element.querySelectorAll('img');
-      for (const img of imgs) {
-        try {
-          const canvas = document.createElement('canvas');
-          const ctx = canvas.getContext('2d');
-          canvas.width = img.naturalWidth || img.width;
-          canvas.height = img.naturalHeight || img.height;
-          
-          ctx.drawImage(img, 0, 0);
-          const dataUrl = canvas.toDataURL('image/png');
-          
+    for (const img of imgs) {
+      try {
+        if (img.src && img.src.startsWith('http')) {
+          const base64 = await this.imageToBase64(img.src);
           this.images.push({
             src: img.src,
-            dataUrl: dataUrl,
-            alt: img.alt || '',
-            width: img.width,
-            height: img.height
+            base64: base64,
+            alt: img.alt || ''
           });
-        } catch (error) {
-          console.warn('Não foi possível extrair imagem:', img.src, error);
         }
+      } catch (error) {
+        console.warn('Erro ao converter imagem:', error);
       }
     }
   }
 
-  cleanContent(content) {
-    const includeImages = document.getElementById('include-images-cb')?.checked ?? true;
-    const removeHeaders = document.getElementById('remove-headers-cb')?.checked ?? true;
-    
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = content;
-    
-    if (removeHeaders) {
-      // Remove elementos comuns de cabeçalho/rodapé
-      const selectorsToRemove = [
-        'header', 'footer', 'nav', '.header', '.footer', '.navigation',
-        '[role="navigation"]', '[role="banner"]', '[role="contentinfo"]',
-        '.sidebar', '.menu', '.toolbar', '.breadcrumb'
-      ];
-      
-      selectorsToRemove.forEach(selector => {
-        const elements = tempDiv.querySelectorAll(selector);
-        elements.forEach(el => el.remove());
-      });
-    }
-    
-    if (!includeImages) {
-      const imgs = tempDiv.querySelectorAll('img');
-      imgs.forEach(img => img.remove());
-    }
-    
-    return tempDiv.innerHTML;
+  async imageToBase64(src) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        resolve(canvas.toDataURL('image/png'));
+      };
+      img.onerror = reject;
+      img.src = src;
+    });
   }
 
-  async openEditor() {
-    if (this.selectedElements.size === 0) {
-      alert('Selecione pelo menos um elemento para editar');
-      return;
+  checkCSP() {
+    try {
+      eval('1+1');
+      this.csp = false;
+    } catch (e) {
+      this.csp = true;
+      console.log('CSP detectado, usando modo nativo');
     }
+  }
 
-    const includeImages = document.getElementById('include-images-cb')?.checked ?? true;
+  async generatePDFNative() {
+    // Cria versão limpa do conteúdo
+    const content = this.createCleanContent();
     
-    if (includeImages) {
-      await this.extractImages();
-    }
-
-    // Coleta conteúdo dos elementos selecionados
-    const selectedElementsList = Array.from(this.selectedElements)
-      .sort((a, b) => a - b)
-      .map(i => this.elements[i]);
+    // Abre janela de impressão
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>AI Chat Export</title>
+        <style>
+          body { font-family: Arial, sans-serif; margin: 20px; }
+          .message { margin-bottom: 20px; padding: 15px; border-radius: 8px; }
+          .user-message { background: #f0f9ff; border-left: 4px solid #0ea5e9; }
+          .ai-message { background: #f9fafb; border-left: 4px solid #6b7280; }
+          .timestamp { font-size: 12px; color: #6b7280; margin-bottom: 5px; }
+          .content { line-height: 1.6; }
+          img { max-width: 100%; height: auto; margin: 10px 0; }
+          pre { background: #f4f4f4; padding: 10px; border-radius: 4px; overflow-x: auto; }
+          code { background: #f4f4f4; padding: 2px 4px; border-radius: 2px; }
+          @media print { body { margin: 0; } }
+        </style>
+      </head>
+      <body>
+        ${content}
+      </body>
+      </html>
+    `);
     
-    let combinedContent = '';
-    selectedElementsList.forEach(element => {
-      const content = this.cleanContent(element.outerHTML);
-      combinedContent += content + '\n\n';
-    });
-
-    // Abre editor em nova aba
-    const editorUrl = browser.runtime.getURL('editor.html');
-    const editorTab = window.open(editorUrl, '_blank', 'width=1200,height=800');
+    printWindow.document.close();
     
-    // Envia dados para o editor
     setTimeout(() => {
-      editorTab.postMessage({
-        type: 'LOAD_CONTENT',
-        content: combinedContent,
-        images: this.images,
-        hostname: location.hostname
-      }, '*');
-    }, 1000);
-
-    this.hideSelectionInterface();
+      printWindow.print();
+      setTimeout(() => printWindow.close(), 1000);
+    }, 500);
   }
 
-  async directExport() {
-    if (this.selectedElements.size === 0) {
-      alert('Selecione pelo menos um elemento para exportar');
-      return;
-    }
-
-    const includeImages = document.getElementById('include-images-cb')?.checked ?? true;
-    
-    if (includeImages) {
-      await this.extractImages();
-    }
-
-    // Para sites com CSP restrito, usa impressão nativa
-    if (this.csp) {
-      this.exportSelectedWithPrint();
-    } else {
-      this.exportSelectedWithHtml2Pdf();
-    }
-    
-    this.hideSelectionInterface();
+  async generatePDFAdvanced() {
+    // Implementação avançada com html2pdf
+    console.log('Gerando PDF avançado...');
+    // Esta função seria implementada se html2pdf estivesse disponível
+    this.generatePDFNative(); // Fallback
   }
 
-  exportSelectedWithPrint() {
-    const selectedElementsList = Array.from(this.selectedElements)
-      .sort((a, b) => a - b)
-      .map(i => this.elements[i]);
-
-    const temp = document.createElement('div');
-    temp.id = 'pdf-export-' + Math.random().toString(36).slice(2, 9);
+  createCleanContent() {
+    let html = `<h1>Exportação de Conversa - ${new Date().toLocaleDateString()}</h1>`;
     
-    selectedElementsList.forEach(element => {
-      const cleanedContent = this.cleanContent(element.outerHTML);
-      const div = document.createElement('div');
-      div.innerHTML = cleanedContent;
-      temp.appendChild(div);
-    });
-
-    const style = document.createElement('style');
-    style.textContent = `
-      @media print {
-        body > * {
-          display: none !important;
-        }
-        #${temp.id} {
-          display: block !important;
-        }
-        #${temp.id} img {
-          max-width: 100%;
-          height: auto;
-        }
+    this.elements.forEach((element, index) => {
+      const content = this.cleanElementContent(element);
+      if (content.trim()) {
+        html += `
+          <div class="message ${index % 2 === 0 ? 'user-message' : 'ai-message'}">
+            <div class="timestamp">${new Date().toLocaleTimeString()}</div>
+            <div class="content">${content}</div>
+          </div>
+        `;
       }
+    });
+    
+    return html;
+  }
+
+  cleanElementContent(element) {
+    const clone = element.cloneNode(true);
+    
+    // Remove elementos desnecessários
+    const unwanted = clone.querySelectorAll('script, style, .pdf-exporter-checkbox, button, [aria-hidden="true"]');
+    unwanted.forEach(el => el.remove());
+    
+    // Converte imagens para base64 se disponível
+    const images = clone.querySelectorAll('img[src]');
+    images.forEach(img => {
+      const base64Image = this.images.find(i => i.src === img.src);
+      if (base64Image) {
+        img.src = base64Image.base64;
+      }
+    });
+    
+    return clone.innerHTML;
+  }
+
+  async showSelectionInterface() {
+    // Remove interface anterior se existir
+    const existing = document.querySelector('.pdf-exporter-sidebar');
+    if (existing) existing.remove();
+    
+    // Torna elementos selecionáveis
+    this.elements.forEach(element => {
+      element.classList.add('pdf-exporter-selectable');
+      const checkbox = document.createElement('div');
+      checkbox.className = 'pdf-exporter-checkbox';
+      checkbox.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.toggleElementSelection(element);
+      });
+      element.appendChild(checkbox);
+    });
+    
+    // Cria sidebar
+    this.createSelectionSidebar();
+  }
+
+  createSelectionSidebar() {
+    const sidebar = document.createElement('div');
+    sidebar.className = 'pdf-exporter-sidebar';
+    sidebar.innerHTML = `
+      <h3>Seleção de Conteúdo</h3>
+      <p>Clique nos elementos para incluir/excluir da exportação</p>
+      <div>
+        <button onclick="aiExporter.selectAll()">Selecionar Todos</button>
+        <button onclick="aiExporter.deselectAll()">Deselecionar Todos</button>
+      </div>
+      <div>
+        <p>Selecionados: <span id="selected-count">0</span></p>
+        <button onclick="aiExporter.exportSelected()">Exportar Selecionados</button>
+      </div>
+      <div>
+        <button onclick="aiExporter.hideInterface()">Fechar</button>
+      </div>
     `;
     
-    document.head.appendChild(style);
-    document.body.appendChild(temp);
-    
-    window.print();
-    
-    setTimeout(() => {
-      if (document.head.contains(style)) document.head.removeChild(style);
-      if (document.body.contains(temp)) document.body.removeChild(temp);
-    }, 1000);
+    document.body.appendChild(sidebar);
   }
 
-  exportSelectedWithHtml2Pdf() {
-    const script = document.createElement('script');
-    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.3/html2pdf.bundle.min.js';
+  toggleElementSelection(element) {
+    const checkbox = element.querySelector('.pdf-exporter-checkbox');
     
-    script.onload = () => {
-      const selectedElementsList = Array.from(this.selectedElements)
-        .sort((a, b) => a - b)
-        .map(i => this.elements[i]);
-
-      const ts = new Date().toISOString().replace(/[-:T.]/g, '').slice(0, 14);
-      
-      const temp = document.createElement('div');
-      selectedElementsList.forEach(element => {
-        const cleanedContent = this.cleanContent(element.outerHTML);
-        const div = document.createElement('div');
-        div.innerHTML = cleanedContent;
-        div.style.marginBottom = '20px';
-        temp.appendChild(div);
-      });
-
-      html2pdf().set({
-        margin: 15,
-        filename: `ai-chat-selected-${ts}.pdf`,
-        html2canvas: { 
-          scale: 2, 
-          logging: false,
-          useCORS: true,
-          allowTaint: true
-        },
-        jsPDF: { 
-          unit: 'mm', 
-          format: 'a4', 
-          orientation: 'portrait' 
-        }
-      }).from(temp).save();
-    };
+    if (this.selectedElements.has(element)) {
+      this.selectedElements.delete(element);
+      element.classList.remove('pdf-exporter-selected');
+      checkbox.classList.remove('selected');
+      checkbox.innerHTML = '';
+    } else {
+      this.selectedElements.add(element);
+      element.classList.add('pdf-exporter-selected');
+      checkbox.classList.add('selected');
+      checkbox.innerHTML = '✓';
+    }
     
-    script.onerror = () => {
-      alert('Erro ao carregar biblioteca html2pdf.js. Usando método de impressão alternativo.');
-      this.exportSelectedWithPrint();
-    };
-    
-    document.body.appendChild(script);
+    this.updateSelectionCount();
   }
 
-  async exportToPDF(hostname) {
-    if (!this.getElementsForSite(hostname)) {
-      alert(`Nenhum elemento encontrado para exportar em ${hostname}`);
+  updateSelectionCount() {
+    const counter = document.getElementById('selected-count');
+    if (counter) {
+      counter.textContent = this.selectedElements.size;
+    }
+  }
+
+  selectAll() {
+    this.elements.forEach(element => {
+      if (!this.selectedElements.has(element)) {
+        this.toggleElementSelection(element);
+      }
+    });
+  }
+
+  deselectAll() {
+    [...this.selectedElements].forEach(element => {
+      this.toggleElementSelection(element);
+    });
+  }
+
+  async exportSelected() {
+    if (this.selectedElements.size === 0) {
+      alert('Nenhum elemento selecionado');
       return;
     }
+    
+    const originalElements = this.elements;
+    this.elements = [...this.selectedElements];
+    
+    try {
+      await this.generatePDFNative();
+    } finally {
+      this.elements = originalElements;
+    }
+  }
 
-    // Mostra interface de seleção
-    this.showSelectionInterface();
+  hideInterface() {
+    const sidebar = document.querySelector('.pdf-exporter-sidebar');
+    if (sidebar) sidebar.remove();
+    
+    this.elements.forEach(element => {
+      element.classList.remove('pdf-exporter-selectable', 'pdf-exporter-selected');
+      const checkbox = element.querySelector('.pdf-exporter-checkbox');
+      if (checkbox) checkbox.remove();
+    });
+    
+    this.selectedElements.clear();
+  }
+
+  toggleSelectionSidebar() {
+    const sidebar = document.querySelector('.pdf-exporter-sidebar');
+    if (sidebar) {
+      this.hideInterface();
+    } else {
+      this.showSelectionInterface();
+    }
+  }
+
+  async getPageInfo() {
+    return {
+      title: document.title,
+      url: window.location.href,
+      hostname: window.location.hostname,
+      elementsFound: this.elements.length,
+      imagesFound: this.images.length,
+      platform: this.detectPlatform(window.location.hostname),
+      hasContent: this.elements.length > 0
+    };
   }
 }
 
-// Inicializa o exportador quando a página carrega
-const advancedPdfExporter = new AdvancedAIChatPDFExporter();
+// Inicializa o exportador
+const aiExporter = new AdvancedAIChatPDFExporter();
+
+// Adiciona função global para acesso do sidebar
+window.aiExporter = aiExporter;
+
+console.log('AI Content Processor carregado com sucesso');
