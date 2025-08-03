@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor de Conteúdo - AI Chat PDF Exporter</title>
+    <link rel="stylesheet" href="editor.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div id="editor-container">
+        <!-- Toolbar superior -->
+        <div id="toolbar">
+            <div class="toolbar-section">
+                <h2><i class="fas fa-file-pdf"></i> Editor de Conteúdo PDF</h2>
+            </div>
+            
+            <div class="toolbar-section">
+                <div class="btn-group">
+                    <button id="save-btn" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Salvar
+                    </button>
+                    <button id="export-pdf-btn" class="btn btn-success">
+                        <i class="fas fa-download"></i> Exportar PDF
+                    </button>
+                    <button id="export-word-btn" class="btn btn-info">
+                        <i class="fas fa-file-word"></i> Exportar Word
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Barra de formatação -->
+        <div id="format-toolbar">
+            <div class="format-group">
+                <select id="font-family" class="format-select">
+                    <option value="Arial">Arial</option>
+                    <option value="Times New Roman">Times New Roman</option>
+                    <option value="Helvetica">Helvetica</option>
+                    <option value="Georgia">Georgia</option>
+                    <option value="Verdana">Verdana</option>
+                </select>
+                
+                <select id="font-size" class="format-select">
+                    <option value="12">12pt</option>
+                    <option value="14">14pt</option>
+                    <option value="16" selected>16pt</option>
+                    <option value="18">18pt</option>
+                    <option value="20">20pt</option>
+                    <option value="24">24pt</option>
+                </select>
+            </div>
+
+            <div class="format-group">
+                <button class="format-btn" data-command="bold" title="Negrito (Ctrl+B)">
+                    <i class="fas fa-bold"></i>
+                </button>
+                <button class="format-btn" data-command="italic" title="Itálico (Ctrl+I)">
+                    <i class="fas fa-italic"></i>
+                </button>
+                <button class="format-btn" data-command="underline" title="Sublinhado (Ctrl+U)">
+                    <i class="fas fa-underline"></i>
+                </button>
+                <button class="format-btn" data-command="strikeThrough" title="Riscado">
+                    <i class="fas fa-strikethrough"></i>
+                </button>
+            </div>
+
+            <div class="format-group">
+                <button class="format-btn" data-command="justifyLeft" title="Alinhar à esquerda">
+                    <i class="fas fa-align-left"></i>
+                </button>
+                <button class="format-btn" data-command="justifyCenter" title="Centralizar">
+                    <i class="fas fa-align-center"></i>
+                </button>
+                <button class="format-btn" data-command="justifyRight" title="Alinhar à direita">
+                    <i class="fas fa-align-right"></i>
+                </button>
+                <button class="format-btn" data-command="justifyFull" title="Justificar">
+                    <i class="fas fa-align-justify"></i>
+                </button>
+            </div>
+
+            <div class="format-group">
+                <button class="format-btn" data-command="insertUnorderedList" title="Lista com marcadores">
+                    <i class="fas fa-list-ul"></i>
+                </button>
+                <button class="format-btn" data-command="insertOrderedList" title="Lista numerada">
+                    <i class="fas fa-list-ol"></i>
+                </button>
+                <button class="format-btn" data-command="outdent" title="Diminuir recuo">
+                    <i class="fas fa-outdent"></i>
+                </button>
+                <button class="format-btn" data-command="indent" title="Aumentar recuo">
+                    <i class="fas fa-indent"></i>
+                </button>
+            </div>
+
+            <div class="format-group">
+                <input type="color" id="text-color" class="color-picker" title="Cor do texto" value="#000000">
+                <input type="color" id="bg-color" class="color-picker" title="Cor de fundo" value="#ffffff">
+            </div>
+
+            <div class="format-group">
+                <button id="insert-image-btn" class="format-btn" title="Inserir imagem">
+                    <i class="fas fa-image"></i>
+                </button>
+                <button id="insert-table-btn" class="format-btn" title="Inserir tabela">
+                    <i class="fas fa-table"></i>
+                </button>
+                <button id="insert-link-btn" class="format-btn" title="Inserir link">
+                    <i class="fas fa-link"></i>
+                </button>
+            </div>
+
+            <div class="format-group">
+                <button id="undo-btn" class="format-btn" title="Desfazer (Ctrl+Z)">
+                    <i class="fas fa-undo"></i>
+                </button>
+                <button id="redo-btn" class="format-btn" title="Refazer (Ctrl+Y)">
+                    <i class="fas fa-redo"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Área principal com sidebar e editor -->
+        <div id="main-content">
+            <!-- Sidebar com estrutura do documento -->
+            <div id="sidebar">
+                <h3><i class="fas fa-sitemap"></i> Estrutura do Documento</h3>
+                <div id="document-outline"></div>
+                
+                <h3><i class="fas fa-images"></i> Imagens</h3>
+                <div id="images-panel"></div>
+                
+                <h3><i class="fas fa-cog"></i> Configurações</h3>
+                <div id="settings-panel">
+                    <label>
+                        <input type="checkbox" id="auto-save" checked> Salvamento automático
+                    </label>
+                    <label>
+                        <input type="checkbox" id="include-metadata" checked> Incluir metadados
+                    </label>
+                    <label>
+                        Margens do PDF:
+                        <select id="pdf-margins">
+                            <option value="narrow">Estreita (12.7mm)</option>
+                            <option value="normal" selected>Normal (25.4mm)</option>
+                            <option value="wide">Larga (38.1mm)</option>
+                        </select>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Editor principal -->
+            <div id="editor-main">
+                <div id="page-info">
+                    <span id="word-count">Palavras: 0</span>
+                    <span id="char-count">Caracteres: 0</span>
+                    <span id="last-saved">Última alteração: nunca</span>
+                </div>
+                
+                <div id="editor" contenteditable="true" spellcheck="true">
+                    <p>Clique aqui para começar a editar seu documento...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Barra de status -->
+        <div id="status-bar">
+            <span id="status-text">Pronto</span>
+            <div id="zoom-controls">
+                <button id="zoom-out" title="Diminuir zoom"><i class="fas fa-search-minus"></i></button>
+                <span id="zoom-level">100%</span>
+                <button id="zoom-in" title="Aumentar zoom"><i class="fas fa-search-plus"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modais -->
+    <div id="insert-image-modal" class="modal">
+        <div class="modal-content">
+            <h3>Inserir Imagem</h3>
+            <input type="file" id="image-file-input" accept="image/*" multiple>
+            <p>Ou selecione uma imagem já extraída:</p>
+            <div id="extracted-images"></div>
+            <div class="modal-buttons">
+                <button id="insert-selected-image" class="btn btn-primary">Inserir</button>
+                <button id="cancel-image-modal" class="btn btn-secondary">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="insert-table-modal" class="modal">
+        <div class="modal-content">
+            <h3>Inserir Tabela</h3>
+            <label>Linhas: <input type="number" id="table-rows" value="3" min="1" max="20"></label>
+            <label>Colunas: <input type="number" id="table-cols" value="3" min="1" max="10"></label>
+            <div class="modal-buttons">
+                <button id="insert-table" class="btn btn-primary">Inserir</button>
+                <button id="cancel-table-modal" class="btn btn-secondary">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="insert-link-modal" class="modal">
+        <div class="modal-content">
+            <h3>Inserir Link</h3>
+            <label>Texto: <input type="text" id="link-text" placeholder="Texto do link"></label>
+            <label>URL: <input type="url" id="link-url" placeholder="https://"></label>
+            <div class="modal-buttons">
+                <button id="insert-link" class="btn btn-primary">Inserir</button>
+                <button id="cancel-link-modal" class="btn btn-secondary">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="editor.js"></script>
+</body>
+</html>
