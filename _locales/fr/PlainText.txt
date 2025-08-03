@@ -1,0 +1,22 @@
+🚀 Exportateur de Conversations IA - Exportez ChatGPT, Deepseek, Gemini, Claude et Grok dans plusieurs formats, ainsi que l'export des aperçus IA de Google Search 🚀
+
+📌 Présentation
+Exportez facilement vos conversations IA aux formats PDF, PNG, Markdown, TXT et plus encore. Rendez vos interactions IA plus efficaces, archivables et partageables. Qu'il s'agisse de notes d'étude, de communications clients, de discussions de code ou d'analyses d'investissement, cette extension vous aide à organiser et sauvegarder rapidement le contenu de vos conversations.
+
+📌 Fonctionnalités Principales
+✅ Export en Un Clic : Support pour PDF, PNG, Markdown, TXT et autres formats
+✅ Captures Haute Qualité : Reproduction parfaite du contenu des conversations ChatGPT et autres IA
+✅ Support Markdown et TXT : Copie et réédition faciles
+✅ Options d'Export Personnalisées : Sélectionnez des enregistrements de chat partiels ou complets
+✅ Sortie Professionnelle : Rendez votre contenu plus raffiné
+
+📌 Parfait Pour
+🎓 Étudiants - Enregistrez des notes d'étude et organisez les connaissances générées par l'IA
+👨‍💻 Développeurs - Archivez les discussions techniques et extraits de code, boostez la productivité
+📊 Investisseurs et Chercheurs - Sauvegardez les analyses financières et données de recherche macroéconomique
+📢 Créateurs de Contenu - Partagez facilement le contenu généré par l'IA
+👨‍💻 Professionnels - Partagez les solutions IA avec vos collègues
+
+🌟 Gratuit à Utiliser, Essayez Maintenant 🌟
+
+🔗 Installez Maintenant et Débloquez un Enregistrement IA Plus Efficace !

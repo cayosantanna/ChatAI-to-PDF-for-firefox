@@ -1,0 +1,14 @@
+{
+  "extensionName": {
+    "message": "مُصدِّر الذكاء الاصطناعي: ChatGPT إلى PDF، يدعم Gemini وClaude وGrok",
+    "description": "The name of the extension"
+  },
+  "extensionDescription": {
+    "message": "احفظ محادثات ChatGPT وClaude وGemini كملفات PDF أو صور أو TXT أو Markdown. يدعم التحميل بنقرة واحدة واختيار المحادثات.",
+    "description": "The description of the extension"
+  },
+  "edgeExtensionName": {
+    "message": "مُصدِّر الذكاء الاصطناعي - حفظ المحادثات كـ PDF",
+    "description": "The name of the extension for Edge"
+  }
+}

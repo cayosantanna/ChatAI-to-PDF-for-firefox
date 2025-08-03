@@ -1,0 +1,14 @@
+{
+  "extensionName": {
+    "message": "AI Exporter：ChatGPT 导出 PDF（支持 Image/Markdown) 兼容 Gemini、Claude、Deepseek 等",
+    "description": "扩展名称"
+  },
+  "extensionDescription": {
+    "message": "将 ChatGPT、DeepSeek 和 Claude, Grok 等 AI 网页的会话，导出为 PDF/图片/Txt/Markdown 等格式，支持一键下载保存和选择会话导出。",
+    "description": "扩展描述"
+  },
+  "edgeExtensionName": {
+    "message": "AI Exporter - 保存 AI 对话为 PDF",
+    "description": "扩展名称"
+  }
+}

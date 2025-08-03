@@ -1,0 +1,14 @@
+{
+  "extensionName": {
+    "message": "AI匯出器：ChatGPT轉PDF（支援PNG/MD），相容Gemini、Claude和Grok",
+    "description": "The name of the extension"
+  },
+  "extensionDescription": {
+    "message": "將ChatGPT、Claude和Gemini對話儲存為PDF、圖片、TXT或Markdown格式。支援一鍵下載和對話選擇。",
+    "description": "The description of the extension"
+  },
+  "edgeExtensionName": {
+    "message": "AI匯出器 - 將對話儲存為PDF",
+    "description": "The name of the extension for Edge"
+  }
+}

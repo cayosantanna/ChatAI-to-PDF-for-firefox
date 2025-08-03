@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Exporter - Configurações</title>
+  <link rel="stylesheet" href="./style.css">
+  <style>
+    /* Firefox scrollbar optimization */
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #ff7139 #f0f0f0;
+      scroll-behavior: smooth;
+    }
+    
+    .container {
+      min-height: 100vh;
+      max-height: none;
+      overflow-y: auto;
+      padding: 20px;
+      padding-bottom: 100px;
+      box-sizing: border-box;
+    }
+    
+    /* Custom scrollbar for Firefox */
+    @-moz-document url-prefix() {
+      * {
+        scrollbar-width: thin;
+        scrollbar-color: #ff7139 #f0f0f0;
+      }
+    }
+    
+    /* Dark theme scrollbar */
+    @media (prefers-color-scheme: dark) {
+      html, body {
+        scrollbar-color: #ff7139 #2b2a33;
+      }
+    }
+    
+    /* Scroll progress indicator */
+    .scroll-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 3px;
+      background: linear-gradient(to right, #ff7139, #ff4500);
+      z-index: 9999;
+      transition: width 0.1s ease;
+    }
+    
+    /* Section navigator */
+    .section-navigator {
+      position: fixed;
+      left: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 12px;
+      padding: 12px 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      z-index: 999;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .nav-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #e2e8f0;
+      margin: 8px 0;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    
+    .nav-dot:hover {
+      background: #ff7139;
+      transform: scale(1.2);
+    }
+    
+    .nav-dot.active {
+      background: #ff7139;
+      transform: scale(1.5);
+    }
+    
+    .nav-dot::after {
+      content: attr(data-section);
+      position: absolute;
+      left: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #333;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    
+    .nav-dot:hover::after {
+      opacity: 1;
+    }
+    
+    /* Back to top button */
+    .back-to-top {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: #ff7139;
+      color: white;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(255, 113, 57, 0.3);
+    }
+    
+    .back-to-top:hover {
+      background: #ff4500;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(255, 113, 57, 0.4);
+    }
+    
+    .back-to-top.visible {
+      opacity: 1;
+    }
+    
+    /* Enhanced sections */
+    .preference-group, .stats-card, .firefox-features {
+      margin-bottom: 30px;
+      scroll-margin-top: 20px;
+    }
+    
+    /* Action buttons sticky */
+    .action-buttons {
+      position: sticky;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 15px 0;
+      margin-top: 30px;
+      border-top: 1px solid #e0e0e0;
+      z-index: 100;
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      .action-buttons {
+        background: rgba(43, 42, 51, 0.95);
+        border-top-color: #5b5b66;
+      }
+      
+      .section-navigator {
+        background: rgba(43, 42, 51, 0.95);
+      }
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .section-navigator {
+        display: none;
+      }
+      
+      .container {
+        padding: 15px;
+      }
+    }
+    
+    /* Page content styles */
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+      padding: 20px 0;
+      border-bottom: 2px solid #ff7139;
+    }
+    
+    header h1 {
+      color: #ff7139;
+      font-size: 2.5em;
+      margin-bottom: 10px;
+    }
+    
+    .preference-group {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 25px;
+      border-left: 4px solid #ff7139;
+    }
+    
+    .preference-group h3 {
+      margin-top: 0;
+      color: #ff7139;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1.3em;
+    }
+    
+    .setting-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 0;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .setting-item:last-child {
+      border-bottom: none;
+    }
+    
+    .setting-description {
+      font-size: 0.9em;
+      color: #666;
+      margin-top: 4px;
+    }
+    
+    .stats-card {
+      background: linear-gradient(135deg, #ff7139 0%, #ff4500 100%);
+      color: white;
+      border-radius: 12px;
+      padding: 25px;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+    
+    .stat-item {
+      text-align: center;
+      background: rgba(255,255,255,0.2);
+      padding: 15px;
+      border-radius: 8px;
+    }
+    
+    .stat-number {
+      font-size: 2em;
+      font-weight: bold;
+      display: block;
+    }
+    
+    .firefox-features {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 12px;
+      padding: 25px;
+    }
+    
+    .feature-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 10px;
+      margin-top: 15px;
+    }
+    
+    .feature-item {
+      background: rgba(255,255,255,0.2);
+      padding: 12px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .keyboard-shortcuts {
+      display: grid;
+      gap: 10px;
+    }
+    
+    .shortcut-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 15px;
+      background: #f5f5f5;
+      border-radius: 8px;
+    }
+    
+    kbd {
+      background: #333;
+      color: white;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 0.9em;
+      margin: 0 2px;
+    }
+    
+    .btn {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin: 0 5px;
+    }
+    
+    .btn-primary {
+      background: #ff7139;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #ff4500;
+      transform: translateY(-2px);
+    }
+    
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+    }
+    
+    .btn-danger {
+      background: #dc3545;
+      color: white;
+    }
+    
+    .btn-outline {
+      background: transparent;
+      color: #ff7139;
+      border: 2px solid #ff7139;
+    }
+    
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      padding: 20px 0;
+      color: #666;
+      border-top: 1px solid #e0e0e0;
+    }
+    
+    footer a {
+      color: #ff7139;
+      text-decoration: none;
+      margin: 0 10px;
+    }
+    
+    footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <!-- Scroll progress indicator -->
+  <div class="scroll-progress" id="scrollProgress"></div>
+  
+  <!-- Section navigator -->
+  <div class="section-navigator" id="sectionNavigator"></div>
+  
+  <!-- Back to top button -->
+  <button class="back-to-top" id="backToTop" title="Voltar ao topo">↑</button>
+
+  <div class="container">
+    <header data-section="header">
+      <h1>🦊 AI Exporter - Configurações</h1>
+      <p>Configure sua experiência de exportação de conversas de IA</p>
+    </header>
+
+    <div class="stats-card" data-section="stats">
+      <h2>📊 Estatísticas de Uso</h2>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <span class="stat-number" id="totalExports">0</span>
+          <span>Total de Exports</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number" id="areaExports">0</span>
+          <span>Seleções de Área</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number" id="standardExports">0</span>
+          <span>Exports Padrão</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number" id="lastExport">Nunca</span>
+          <span>Último Export</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="firefox-features" data-section="firefox">
+      <h2>🦊 Funcionalidades Específicas do Firefox</h2>
+      <div class="feature-list">
+        <div class="feature-item">
+          <span>📑</span>
+          <span>Sidebar Nativa</span>
+        </div>
+        <div class="feature-item">
+          <span>📦</span>
+          <span>Suporte a Containers</span>
+        </div>
+        <div class="feature-item">
+          <span>🎨</span>
+          <span>Detecção de Temas</span>
+        </div>
+        <div class="feature-item">
+          <span>🔒</span>
+          <span>Privacidade Avançada</span>
+        </div>
+        <div class="feature-item">
+          <span>⌨️</span>
+          <span>Atalhos de Teclado</span>
+        </div>
+        <div class="feature-item">
+          <span>📐</span>
+          <span>Seleção de Área</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="preference-group" data-section="export">
+      <h3>📄 Configurações de Exportação</h3>
+      <div class="setting-item">
+        <div>
+          <label for="defaultFormat"><strong>Formato Padrão de Exportação</strong></label>
+          <div class="setting-description">Formato usado quando não especificado</div>
+        </div>
+        <select id="defaultFormat">
+          <option value="pdf">PDF</option>
+          <option value="png">PNG (Imagem)</option>
+          <option value="markdown">Markdown</option>
+          <option value="txt">Texto Simples</option>
+        </select>
+      </div>
+      <div class="setting-item">
+        <div>
+          <label for="selectionMode"><strong>Modo de Seleção Padrão</strong></label>
+          <div class="setting-description">Como selecionar conteúdo para exportar</div>
+        </div>
+        <select id="selectionMode">
+          <option value="area">Seleção de Área</option>
+          <option value="element">Elemento Completo</option>
+          <option value="full">Página Completa</option>
+        </select>
+      </div>
+      <div class="setting-item">
+        <div>
+          <label for="autoSave"><strong>Salvamento Automático</strong></label>
+          <div class="setting-description">Salvar automaticamente sem diálogo</div>
+        </div>
+        <input type="checkbox" id="autoSave">
+      </div>
+    </div>
+
+    <div class="preference-group" data-section="interface">
+      <h3>🎨 Interface e Experiência</h3>
+      <div class="setting-item">
+        <div>
+          <label for="showNotifications"><strong>Mostrar Notificações</strong></label>
+          <div class="setting-description">Exibir notificações de sucesso/erro</div>
+        </div>
+        <input type="checkbox" id="showNotifications" checked>
+      </div>
+      <div class="setting-item">
+        <div>
+          <label for="enableAnimations"><strong>Animações</strong></label>
+          <div class="setting-description">Ativar animações da interface</div>
+        </div>
+        <input type="checkbox" id="enableAnimations" checked>
+      </div>
+      <div class="setting-item">
+        <div>
+          <label for="compactMode"><strong>Modo Compacto</strong></label>
+          <div class="setting-description">Interface mais compacta no popup</div>
+        </div>
+        <input type="checkbox" id="compactMode">
+      </div>
+    </div>
+
+    <div class="preference-group" data-section="advanced">
+      <h3>⚙️ Configurações Avançadas</h3>
+      <div class="setting-item">
+        <div>
+          <label for="debugMode"><strong>Modo Debug</strong></label>
+          <div class="setting-description">Ativar logs detalhados no console</div>
+        </div>
+        <input type="checkbox" id="debugMode">
+      </div>
+      <div class="setting-item">
+        <div>
+          <label for="exportHistory"><strong>Manter Histórico</strong></label>
+          <div class="setting-description">Salvar histórico de exportações</div>
+        </div>
+        <input type="checkbox" id="exportHistory" checked>
+      </div>
+      <div class="setting-item">
+        <div>
+          <label for="maxHistoryItems"><strong>Máximo de Itens no Histórico</strong></label>
+          <div class="setting-description">Número máximo de itens salvos</div>
+        </div>
+        <input type="number" id="maxHistoryItems" min="10" max="500" value="100">
+      </div>
+    </div>
+
+    <div class="preference-group" data-section="shortcuts">
+      <h3>⌨️ Atalhos de Teclado</h3>
+      <div class="keyboard-shortcuts">
+        <div class="shortcut-item">
+          <span><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>E</kbd></span>
+          <span>Exportação Rápida</span>
+        </div>
+        <div class="shortcut-item">
+          <span><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>A</kbd></span>
+          <span>Seleção de Área</span>
+        </div>
+        <div class="shortcut-item">
+          <span><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd></span>
+          <span>Toggle Sidebar</span>
+        </div>
+        <div class="shortcut-item">
+          <span><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>O</kbd></span>
+          <span>Abrir Configurações</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="action-buttons" data-section="actions">
+      <button id="saveBtn" class="btn btn-primary">💾 Salvar Configurações</button>
+      <button id="resetBtn" class="btn btn-secondary">🔄 Restaurar Padrões</button>
+      <button id="clearHistoryBtn" class="btn btn-danger">🗑️ Limpar Histórico</button>
+      <button id="exportSettingsBtn" class="btn btn-outline">📤 Exportar Configurações</button>
+    </div>
+
+    <footer>
+      <p>AI Exporter v<span id="version">3.5.4</span> - Otimizado para Firefox 🦊</p>
+      <p>
+        <a href="#" id="aboutLink">Sobre</a> |
+        <a href="#" id="helpLink">Ajuda</a> |
+        <a href="#" id="githubLink">GitHub</a>
+      </p>
+    </footer>
+  </div>
+
+  <script src="../browser-polyfill.js"></script>
+  <script src="./enhanced-options.js"></script>
+  
+  <script>
+    // Enhanced scroll navigation system
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('🦊 AI Exporter Enhanced Options - Sistema de navegação avançado ativado');
+      
+      // Initialize scroll system
+      initializeScrollSystem();
+    });
+    
+    function initializeScrollSystem() {
+      const scrollProgress = document.getElementById('scrollProgress');
+      const sectionNavigator = document.getElementById('sectionNavigator');
+      const backToTop = document.getElementById('backToTop');
+      const sections = document.querySelectorAll('[data-section]');
+      
+      // Section names for navigator
+      const sectionNames = {
+        'header': 'Início',
+        'stats': 'Estatísticas',
+        'firefox': 'Firefox',
+        'export': 'Exportação',
+        'interface': 'Interface',
+        'advanced': 'Avançado',
+        'shortcuts': 'Atalhos',
+        'actions': 'Ações'
+      };
+      
+      // Create navigation dots
+      sections.forEach((section, index) => {
+        const sectionId = section.getAttribute('data-section');
+        const dot = document.createElement('div');
+        dot.className = 'nav-dot';
+        dot.setAttribute('data-section', sectionNames[sectionId] || `Seção ${index + 1}`);
+        dot.setAttribute('data-index', index);
+        
+        dot.addEventListener('click', () => {
+          section.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          updateActiveSection(index);
+        });
+        
+        sectionNavigator.appendChild(dot);
+      });
+      
+      // Scroll event handler
+      window.addEventListener('scroll', () => {
+        updateScrollProgress();
+        updateNavigatorVisibility();
+        updateBackToTopVisibility();
+        updateActiveSection();
+      });
+      
+      // Back to top functionality
+      backToTop.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+      
+      // Initialize display
+      updateScrollProgress();
+      updateActiveSection();
+      
+      function updateScrollProgress() {
+        const scrolled = window.pageYOffset;
+        const maxHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const progress = maxHeight > 0 ? (scrolled / maxHeight) * 100 : 0;
+        scrollProgress.style.width = Math.min(100, Math.max(0, progress)) + '%';
+      }
+      
+      function updateNavigatorVisibility() {
+        const shouldShow = window.pageYOffset > 200 && window.innerWidth > 768;
+        sectionNavigator.style.opacity = shouldShow ? '1' : '0';
+      }
+      
+      function updateBackToTopVisibility() {
+        const shouldShow = window.pageYOffset > 300;
+        backToTop.classList.toggle('visible', shouldShow);
+      }
+      
+      function updateActiveSection(forceIndex = null) {
+        const dots = sectionNavigator.querySelectorAll('.nav-dot');
+        
+        if (forceIndex !== null) {
+          dots.forEach((dot, i) => {
+            dot.classList.toggle('active', i === forceIndex);
+          });
+          return;
+        }
+        
+        const scrollTop = window.pageYOffset + window.innerHeight / 2;
+        let activeIndex = 0;
+        
+        sections.forEach((section, index) => {
+          const rect = section.getBoundingClientRect();
+          const isInView = rect.top <= window.innerHeight / 2 && rect.bottom >= window.innerHeight / 2;
+          
+          if (isInView) {
+            activeIndex = index;
+          }
+        });
+        
+        dots.forEach((dot, i) => {
+          dot.classList.toggle('active', i === activeIndex);
+        });
+      }
+      
+      // Keyboard navigation
+      document.addEventListener('keydown', (e) => {
+        if (e.altKey) {
+          switch (e.key) {
+            case 'ArrowUp':
+              e.preventDefault();
+              scrollToPreviousSection();
+              break;
+            case 'ArrowDown':
+              e.preventDefault();
+              scrollToNextSection();
+              break;
+            case 'Home':
+              e.preventDefault();
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+              break;
+            case 'End':
+              e.preventDefault();
+              window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+              break;
+          }
+        }
+      });
+      
+      function scrollToPreviousSection() {
+        const currentScroll = window.pageYOffset;
+        let targetSection = sections[0];
+        
+        for (let i = sections.length - 1; i >= 0; i--) {
+          const sectionTop = sections[i].offsetTop;
+          if (sectionTop < currentScroll - 50) {
+            targetSection = sections[i];
+            break;
+          }
+        }
+        
+        targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      
+      function scrollToNextSection() {
+        const currentScroll = window.pageYOffset;
+        let targetSection = sections[sections.length - 1];
+        
+        for (let i = 0; i < sections.length; i++) {
+          const sectionTop = sections[i].offsetTop;
+          if (sectionTop > currentScroll + 50) {
+            targetSection = sections[i];
+            break;
+          }
+        }
+        
+        targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      
+      // Add help tooltip
+      const helpTooltip = document.createElement('div');
+      helpTooltip.style.cssText = `
+        position: fixed;
+        bottom: 80px;
+        right: 20px;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+        z-index: 1001;
+      `;
+      helpTooltip.textContent = 'Alt + ↑/↓ para navegar seções';
+      document.body.appendChild(helpTooltip);
+      
+      // Show help tooltip briefly
+      setTimeout(() => {
+        helpTooltip.style.opacity = '1';
+        setTimeout(() => {
+          helpTooltip.style.opacity = '0';
+        }, 3000);
+      }, 1000);
+    }
+  </script>
+</body>
+</html>

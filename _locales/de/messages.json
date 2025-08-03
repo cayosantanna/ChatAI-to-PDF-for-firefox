@@ -1,0 +1,14 @@
+{
+  "extensionName": {
+    "message": "AI Exporter: ChatGPT zu PDF, Unterstützt Gemini, Claude und Grok",
+    "description": "The name of the extension"
+  },
+  "extensionDescription": {
+    "message": "Speichern Sie ChatGPT-, Claude- und Gemini-Gespräche als PDF, Bild, TXT oder Markdown. Unterstützt Ein-Klick-Download und Gesprächsauswahl.",
+    "description": "The description of the extension"
+  },
+  "edgeExtensionName": {
+    "message": "AI Exporter - Gespräche als PDF speichern",
+    "description": "The name of the extension for Edge"
+  }
+}
