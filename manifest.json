@@ -1,1 +1,125 @@
-{  "manifest_version": 3,  "name": "__MSG_extensionName__",  "description": "__MSG_extensionDescription__",  "version": "3.5.4",  "default_locale": "en",  "icons": {    "16": "assets/icon/16.png",    "32": "assets/icon/32.png",    "48": "assets/icon/48.png",    "128": "assets/icon/128.png"  },  "permissions": [    "storage",    "activeTab",    "tabs",    "downloads",    "clipboardWrite"  ],  "host_permissions": [    "https://chatgpt.com/*",    "https://claude.ai/*",    "https://gemini.google.com/*",    "https://chat.deepseek.com/*",    "https://grok.x.ai/*",    "https://www.perplexity.ai/*",    "https://aistudio.google.com/*",    "https://poe.com/*",    "https://you.com/*",    "https://copilot.microsoft.com/*",    "https://character.ai/*"  ],  "action": {    "default_popup": "dist/popup/index.html",    "default_icon": {      "16": "assets/icon/16.png",      "32": "assets/icon/32.png",      "48": "assets/icon/48.png",      "128": "assets/icon/128.png"    }  },  "background": {    "scripts": [      "browser-polyfill.js",      "dist/background/firefox-background.js"    ]  },  "content_scripts": [    {      "matches": [        "https://chatgpt.com/*",        "https://claude.ai/*",        "https://gemini.google.com/*",        "https://chat.deepseek.com/*",        "https://grok.x.ai/*",        "https://www.perplexity.ai/*",        "https://aistudio.google.com/*",        "https://poe.com/*",        "https://you.com/*",        "https://copilot.microsoft.com/*",        "https://character.ai/*"      ],      "js": [        "dist/contentScripts/ai-exporter-content.js"      ],      "css": [        "dist/contentScripts/style.css"      ],      "run_at": "document_end"    }  ],  "options_ui": {    "page": "dist/options/enhanced-options.html",    "open_in_tab": true  },  "commands": {    "quick-export": {      "suggested_key": {        "default": "Ctrl+Shift+E"      },      "description": "Exportação rápida do conteúdo da página"    },    "area-selection": {      "suggested_key": {        "default": "Ctrl+Shift+A"      },      "description": "Iniciar seleção de área para exportar"    },    "toggle-sidebar": {      "suggested_key": {        "default": "Ctrl+Shift+S"      },      "description": "Abrir/fechar sidebar do AI Exporter"    },    "open-options": {      "suggested_key": {        "default": "Ctrl+Shift+O"      },      "description": "Abrir página de configurações"    }  },  "web_accessible_resources": [    {      "resources": [        "dist/contentScripts/style.css",        "assets/*",        "dist/editor/*"      ],      "matches": [        "https://chatgpt.com/*",        "https://claude.ai/*",        "https://gemini.google.com/*",        "https://chat.deepseek.com/*",        "https://grok.x.ai/*",        "https://www.perplexity.ai/*",        "https://aistudio.google.com/*",        "https://poe.com/*",        "https://you.com/*",        "https://copilot.microsoft.com/*",        "https://character.ai/*"      ]    }  ],  "sidebar_action": {    "default_panel": "dist/sidebar/firefox-sidebar.html",    "default_icon": {      "32": "assets/icon.svg"    },    "default_title": "__MSG_extensionName__",    "open_at_install": false  },  "content_security_policy": {    "extension_pages": "script-src 'self'; object-src 'self'"  },  "browser_specific_settings": {    "gecko": {      "id": "ai-exporter@firefox-extension.com",      "strict_min_version": "115.0"    }  }}
+{
+  "manifest_version": 2,
+  "name": "AI Chat PDF Exporter",
+  "version": "1.0",
+  "description": "Exporta conversas de IAs (Claude, ChatGPT, Grok, Gemini) para PDF",
+
+  "permissions": [
+    "activeTab",
+    "notifications",
+    "storage",
+    "tabs",
+    "downloads",
+    "contextMenus",
+    "clipboardWrite",
+    "webRequest",
+    "webRequestBlocking",
+    "https://claude.ai/*",
+    "https://chatgpt.com/*", 
+    "https://grok.com/*",
+    "https://gemini.google.com/*",
+    "https://www.notion.so/*",
+    "https://docs.google.com/*",
+    "https://github.com/*",
+    "https://stackoverflow.com/*",
+    "https://medium.com/*",
+    "https://reddit.com/*",
+    "https://discord.com/*",
+    "https://slack.com/*",
+    "https://teams.microsoft.com/*",
+    "https://zoom.us/*",
+    "<all_urls>"
+  ],
+
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+
+  "content_scripts": [
+    {
+      "matches": [
+        "https://claude.ai/*",
+        "https://chatgpt.com/*",
+        "https://grok.com/*", 
+        "https://gemini.google.com/*",
+        "https://www.notion.so/*",
+        "https://docs.google.com/*",
+        "https://github.com/*",
+        "https://stackoverflow.com/*",
+        "https://medium.com/*",
+        "https://reddit.com/*",
+        "https://discord.com/*",
+        "https://slack.com/*",
+        "https://teams.microsoft.com/*",
+        "https://zoom.us/*",
+        "https://*/*",
+        "http://*/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_end"
+    }
+  ],
+
+  "browser_action": {
+    "default_popup": "popup.html",
+    "default_title": "AI Content Processor",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
+  },
+
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+
+  "icons": {
+    "16": "icons/icon_16.png",
+    "32": "icons/icon_32.png",
+    "48": "icons/icon_48.png",
+    "128": "icons/icon_128.png"
+  },
+
+  "web_accessible_resources": [
+    "editor.html",
+    "editor.css",
+    "editor.js",
+    "popup.html",
+    "popup.css",
+    "popup.js",
+    "sidebar.html",
+    "sidebar.css", 
+    "sidebar.js",
+    "overlay.html",
+    "overlay.css",
+    "overlay.js",
+    "libs/*",
+    "templates/*",
+    "assets/*"
+  ],
+
+  "commands": {
+    "quick-capture": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+S"
+      },
+      "description": "Captura rápida de conteúdo"
+    },
+    "open-editor": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+E"
+      },
+      "description": "Abrir editor avançado"
+    },
+    "toggle-sidebar": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+B"
+      },
+      "description": "Toggle sidebar de ferramentas"
+    }
+  }
+}

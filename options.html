@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Content Processor - Configurações</title>
+    <link rel="stylesheet" href="options.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="options-container">
+        <header class="options-header">
+            <div class="header-content">
+                <i class="fas fa-cogs"></i>
+                <h1>Configurações Avançadas</h1>
+            </div>
+        </header>
+
+        <nav class="options-nav">
+            <button class="nav-item active" data-section="general">
+                <i class="fas fa-sliders-h"></i>
+                <span>Geral</span>
+            </button>
+            <button class="nav-item" data-section="capture">
+                <i class="fas fa-crosshairs"></i>
+                <span>Captura</span>
+            </button>
+            <button class="nav-item" data-section="processing">
+                <i class="fas fa-cogs"></i>
+                <span>Processamento</span>
+            </button>
+            <button class="nav-item" data-section="export">
+                <i class="fas fa-download"></i>
+                <span>Exportação</span>
+            </button>
+            <button class="nav-item" data-section="ai">
+                <i class="fas fa-brain"></i>
+                <span>IA</span>
+            </button>
+            <button class="nav-item" data-section="advanced">
+                <i class="fas fa-code"></i>
+                <span>Avançado</span>
+            </button>
+        </nav>
+
+        <main class="options-main">
+            <!-- Seção Geral -->
+            <section id="section-general" class="option-section active">
+                <h2>Configurações Gerais</h2>
+                
+                <div class="setting-group">
+                    <h3>Interface</h3>
+                    <div class="setting-item">
+                        <label>
+                            <span>Tema da interface</span>
+                            <select id="ui-theme">
+                                <option value="auto">Automático</option>
+                                <option value="light">Claro</option>
+                                <option value="dark">Escuro</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label>
+                            <span>Idioma</span>
+                            <select id="language">
+                                <option value="pt-BR">Português (Brasil)</option>
+                                <option value="en-US">English (US)</option>
+                                <option value="es-ES">Español</option>
+                                <option value="fr-FR">Français</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="show-notifications">
+                            <span class="checkmark"></span>
+                            <span>Mostrar notificações</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-group">
+                    <h3>Comportamento</h3>
+                    <div class="setting-item">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="auto-detect-content">
+                            <span class="checkmark"></span>
+                            <span>Detectar conteúdo automaticamente</span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="remember-settings">
+                            <span class="checkmark"></span>
+                            <span>Lembrar configurações de exportação</span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="close-after-export">
+                            <span class="checkmark"></span>
+                            <span>Fechar popup após exportar</span>
+                        </label>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Seção Captura -->
+            <section id="section-capture" class="option-section">
+                <h2>Configurações de Captura</h2>
+                
+                <div class="setting-group">
+                    <h3>Modo Padrão</h3>
+                    <div class="setting-item">
+                        <label>
+                            <span>Modo de captura padrão</span>
+                            <select id="default-capture-mode">
+                                <option value="smart">Inteligente</option>
+                                <option value="visual">Visual</option>
+                                <option value="area">Área</option>
+                                <option value="full">Página completa</option>
+                            </select>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-group">
+                    <h3>Seletores Personalizados</h3>
+                    <div class="setting-item">
+                        <label>
+                            <span>Seletores CSS para ignorar</span>
+                            <textarea id="ignore-selectors" placeholder=".ads, .sidebar, .footer">[ads], [role="banner"], .navigation</textarea>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label>
+                            <span>Seletores CSS para priorizar</span>
+                            <textarea id="priority-selectors" placeholder="article, .content, main">article, main, .content, [role="main"]</textarea>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-group">
+                    <h3>Configurações por Site</h3>
+                    <div class="site-config">
+                        <div class="site-item">
+                            <span class="site-name">Claude.ai</span>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="claude-artifacts">
+                                <span class="checkmark"></span>
+                                <span>Incluir artifacts</span>
+                            </label>
+                        </div>
+                        <div class="site-item">
+                            <span class="site-name">ChatGPT</span>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="chatgpt-canvas">
+                                <span class="checkmark"></span>
+                                <span>Incluir canvas</span>
+                            </label>
+                        </div>
+                        <div class="site-item">
+                            <span class="site-name">Notion</span>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="notion-comments">
+                                <span class="checkmark"></span>
+                                <span>Incluir comentários</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Seção Processamento -->
+            <section id="section-processing" class="option-section">
+                <h2>Configurações de Processamento</h2>
+                
+                <div class="setting-group">
+                    <h3>Limpeza de Conteúdo</h3>
+                    <div class="setting-item">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="remove-ads" checked>
+                            <span class="checkmark"></span>
+                            <span>Remover anúncios automaticamente</span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="remove-navigation" checked>
+                            <span class="checkmark"></span>
+                            <span>Remover navegação</span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="remove-comments">
+                            <span class="checkmark"></span>
+                            <span>Remover comentários</span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="clean-formatting">
+                            <span class="checkmark"></span>
+                            <span>Limpar formatação desnecessária</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-group">
+                    <h3>Otimização de Imagens</h3>
+                    <div class="setting-item">
+                        <label>
+                            <span>Qualidade padrão de imagens</span>
+                            <select id="default-image-quality">
+                                <option value="low">Baixa (rápido)</option>
+                                <option value="medium">Média</option>
+                                <option value="high">Alta (lento)</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label>
+                            <span>Tamanho máximo de imagem (px)</span>
+                            <input type="number" id="max-image-size" value="1920" min="100" max="4000">
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="compress-images" checked>
+                            <span class="checkmark"></span>
+                            <span>Comprimir imagens automaticamente</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-group">
+                    <h3>Processamento de Texto</h3>
+                    <div class="setting-item">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="fix-encoding">
+                            <span class="checkmark"></span>
+                            <span>Corrigir codificação de caracteres</span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="normalize-whitespace">
+                            <span class="checkmark"></span>
+                            <span>Normalizar espaços em branco</span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="remove-empty-paragraphs">
+                            <span class="checkmark"></span>
+                            <span>Remover parágrafos vazios</span>
+                        </label>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Seção Exportação -->
+            <section id="section-export" class="option-section">
+                <h2>Configurações de Exportação</h2>
+                
+                <div class="setting-group">
+                    <h3>Configurações PDF</h3>
+                    <div class="setting-item">
+                        <label>
+                            <span>Tamanho de página padrão</span>
+                            <select id="default-page-size">
+                                <option value="a4">A4</option>
+                                <option value="letter">Letter</option>
+                                <option value="legal">Legal</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label>
+                            <span>Margens (mm)</span>
+                            <input type="number" id="pdf-margins" value="20" min="0" max="50">
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="include-metadata" checked>
+                            <span class="checkmark"></span>
+                            <span>Incluir metadados no PDF</span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="pdf-bookmarks">
+                            <span class="checkmark"></span>
+                            <span>Gerar marcadores automáticos</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-group">
+                    <h3>Nomenclatura de Arquivos</h3>
+                    <div class="setting-item">
+                        <label>
+                            <span>Padrão de nome de arquivo</span>
+                            <select id="filename-pattern">
+                                <option value="title-date">Título - Data</option>
+                                <option value="date-title">Data - Título</option>
+                                <option value="site-title-date">Site - Título - Data</option>
+                                <option value="custom">Personalizado</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="setting-item" id="custom-pattern-container" style="display: none;">
+                        <label>
+                            <span>Padrão personalizado</span>
+                            <input type="text" id="custom-filename-pattern" placeholder="{site}_{title}_{date}">
+                            <small>Variáveis: {site}, {title}, {date}, {time}</small>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-group">
+                    <h3>Local de Download</h3>
+                    <div class="setting-item">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="ask-download-location">
+                            <span class="checkmark"></span>
+                            <span>Perguntar local de download</span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label>
+                            <span>Pasta padrão de downloads</span>
+                            <input type="text" id="default-download-folder" placeholder="Downloads/AI-Content">
+                        </label>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Seção IA -->
+            <section id="section-ai" class="option-section">
+                <h2>Configurações de IA</h2>
+                
+                <div class="setting-group">
+                    <h3>Serviços de IA</h3>
+                    <div class="setting-item">
+                        <label>
+                            <span>Provedor de IA para resumos</span>
+                            <select id="ai-provider">
+                                <option value="none">Desabilitado</option>
+                                <option value="openai">OpenAI GPT</option>
+                                <option value="anthropic">Anthropic Claude</option>
+                                <option value="local">Local (Ollama)</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="setting-item" id="ai-api-key-container">
+                        <label>
+                            <span>Chave da API</span>
+                            <input type="password" id="ai-api-key" placeholder="sk-...">
+                            <small>Suas chaves são armazenadas localmente e criptografadas</small>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-group">
+                    <h3>Funcionalidades de IA</h3>
+                    <div class="setting-item">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="auto-summarize">
+                            <span class="checkmark"></span>
+                            <span>Gerar resumo automaticamente</span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="auto-extract-keywords">
+                            <span class="checkmark"></span>
+                            <span>Extrair palavras-chave</span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="auto-generate-toc">
+                            <span class="checkmark"></span>
+                            <span>Gerar índice automaticamente</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-group">
+                    <h3>Tradução</h3>
+                    <div class="setting-item">
+                        <label>
+                            <span>Idioma padrão para tradução</span>
+                            <select id="translation-target">
+                                <option value="pt">Português</option>
+                                <option value="en">Inglês</option>
+                                <option value="es">Espanhol</option>
+                                <option value="fr">Francês</option>
+                                <option value="de">Alemão</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="detect-language">
+                            <span class="checkmark"></span>
+                            <span>Detectar idioma automaticamente</span>
+                        </label>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Seção Avançado -->
+            <section id="section-advanced" class="option-section">
+                <h2>Configurações Avançadas</h2>
+                
+                <div class="setting-group">
+                    <h3>Desempenho</h3>
+                    <div class="setting-item">
+                        <label>
+                            <span>Número máximo de elementos processados</span>
+                            <input type="number" id="max-elements" value="1000" min="100" max="10000">
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label>
+                            <span>Timeout de processamento (segundos)</span>
+                            <input type="number" id="processing-timeout" value="30" min="10" max="300">
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="parallel-processing">
+                            <span class="checkmark"></span>
+                            <span>Processamento paralelo</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-group">
+                    <h3>Debug</h3>
+                    <div class="setting-item">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="debug-mode">
+                            <span class="checkmark"></span>
+                            <span>Modo debug</span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="verbose-logging">
+                            <span class="checkmark"></span>
+                            <span>Log detalhado</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-group">
+                    <h3>Cache</h3>
+                    <div class="setting-item">
+                        <label>
+                            <span>Tamanho máximo do cache (MB)</span>
+                            <input type="number" id="cache-size" value="100" min="10" max="1000">
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <button id="clear-cache" class="btn btn-secondary">
+                            <i class="fas fa-trash"></i>
+                            Limpar Cache
+                        </button>
+                    </div>
+                </div>
+
+                <div class="setting-group">
+                    <h3>Dados</h3>
+                    <div class="setting-item">
+                        <button id="export-settings" class="btn btn-secondary">
+                            <i class="fas fa-download"></i>
+                            Exportar Configurações
+                        </button>
+                    </div>
+                    <div class="setting-item">
+                        <button id="import-settings" class="btn btn-secondary">
+                            <i class="fas fa-upload"></i>
+                            Importar Configurações
+                        </button>
+                        <input type="file" id="import-file" accept=".json" style="display: none;">
+                    </div>
+                    <div class="setting-item">
+                        <button id="reset-settings" class="btn btn-danger">
+                            <i class="fas fa-undo"></i>
+                            Resetar Todas as Configurações
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="options-footer">
+            <div class="footer-actions">
+                <button id="save-settings" class="btn btn-primary">
+                    <i class="fas fa-save"></i>
+                    Salvar Configurações
+                </button>
+                <button id="cancel-settings" class="btn btn-secondary">
+                    Cancelar
+                </button>
+            </div>
+            <div class="footer-info">
+                <span id="save-status">Configurações salvas automaticamente</span>
+            </div>
+        </footer>
+    </div>
+
+    <script src="options.js"></script>
+</body>
+</html>

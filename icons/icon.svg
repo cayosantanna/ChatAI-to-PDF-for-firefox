@@ -1,0 +1,37 @@
+<!-- SVG Icon for AI Content Processor -->
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0066cc"/>
+      <stop offset="100%" stop-color="#0052a3"/>
+    </linearGradient>
+    <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#e8f4ff"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="64" cy="64" r="60" fill="url(#bgGradient)" stroke="#003d7a" stroke-width="2"/>
+  
+  <!-- Document icon -->
+  <rect x="28" y="24" width="52" height="68" rx="4" fill="url(#iconGradient)" stroke="#0066cc" stroke-width="1.5"/>
+  
+  <!-- Document lines -->
+  <line x1="36" y1="36" x2="64" y2="36" stroke="#0066cc" stroke-width="2" stroke-linecap="round"/>
+  <line x1="36" y1="44" x2="72" y2="44" stroke="#0066cc" stroke-width="2" stroke-linecap="round"/>
+  <line x1="36" y1="52" x2="68" y2="52" stroke="#0066cc" stroke-width="2" stroke-linecap="round"/>
+  <line x1="36" y1="60" x2="72" y2="60" stroke="#0066cc" stroke-width="2" stroke-linecap="round"/>
+  <line x1="36" y1="68" x2="60" y2="68" stroke="#0066cc" stroke-width="2" stroke-linecap="round"/>
+  
+  <!-- AI brain icon -->
+  <circle cx="88" cy="40" r="16" fill="#4dabf7" stroke="#ffffff" stroke-width="2"/>
+  <circle cx="84" cy="36" r="2" fill="#ffffff"/>
+  <circle cx="92" cy="36" r="2" fill="#ffffff"/>
+  <circle cx="88" cy="44" r="3" fill="#ffffff"/>
+  <path d="M 80 40 Q 88 48 96 40" stroke="#ffffff" stroke-width="2" fill="none" stroke-linecap="round"/>
+  
+  <!-- PDF indicator -->
+  <rect x="84" y="88" width="20" height="16" rx="2" fill="#dc3545"/>
+  <text x="94" y="98" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="8" font-weight="bold">PDF</text>
+</svg>

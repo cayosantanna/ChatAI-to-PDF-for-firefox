@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Content Processor</title>
+    <link rel="stylesheet" href="popup.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div id="popup-container">
+        <!-- Header com logo e informações -->
+        <header id="popup-header">
+            <div class="header-brand">
+                <i class="fas fa-file-export"></i>
+                <h2>AI Content Processor</h2>
+            </div>
+            <div class="header-info">
+                <span id="site-detection">🔍 Detectando...</span>
+            </div>
+        </header>
+
+        <!-- Navegação por abas -->
+        <nav id="popup-nav">
+            <button class="nav-tab active" data-tab="capture">
+                <i class="fas fa-capture"></i> Capturar
+            </button>
+            <button class="nav-tab" data-tab="process">
+                <i class="fas fa-cogs"></i> Processar
+            </button>
+            <button class="nav-tab" data-tab="export">
+                <i class="fas fa-download"></i> Exportar
+            </button>
+            <button class="nav-tab" data-tab="history">
+                <i class="fas fa-history"></i> Histórico
+            </button>
+        </nav>
+
+        <!-- Aba Capturar -->
+        <div id="tab-capture" class="tab-content active">
+            <div class="detection-panel">
+                <h3><i class="fas fa-radar"></i> Detecção Inteligente</h3>
+                <div id="detected-elements">
+                    <div class="detection-item">
+                        <span class="detection-type">🤖 Conversas de IA</span>
+                        <span class="detection-count" id="ai-count">0</span>
+                    </div>
+                    <div class="detection-item">
+                        <span class="detection-type">🖼️ Imagens</span>
+                        <span class="detection-count" id="image-count">0</span>
+                    </div>
+                    <div class="detection-item">
+                        <span class="detection-type">📝 Artigos</span>
+                        <span class="detection-count" id="article-count">0</span>
+                    </div>
+                    <div class="detection-item">
+                        <span class="detection-type">💬 Comentários</span>
+                        <span class="detection-count" id="comment-count">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="capture-modes">
+                <h3><i class="fas fa-crosshairs"></i> Modo de Captura</h3>
+                <div class="mode-grid">
+                    <button class="mode-btn" id="mode-visual" data-mode="visual">
+                        <i class="fas fa-mouse-pointer"></i>
+                        <span>Visual</span>
+                        <small>Clique e selecione</small>
+                    </button>
+                    <button class="mode-btn" id="mode-smart" data-mode="smart">
+                        <i class="fas fa-brain"></i>
+                        <span>Inteligente</span>
+                        <small>Auto-detecta</small>
+                    </button>
+                    <button class="mode-btn" id="mode-area" data-mode="area">
+                        <i class="fas fa-crop"></i>
+                        <span>Área</span>
+                        <small>Selecione região</small>
+                    </button>
+                    <button class="mode-btn" id="mode-full" data-mode="full">
+                        <i class="fas fa-globe"></i>
+                        <span>Página</span>
+                        <small>Página completa</small>
+                    </button>
+                </div>
+            </div>
+
+            <div class="quick-actions">
+                <button id="quick-capture" class="btn btn-primary">
+                    <i class="fas fa-bolt"></i> Captura Rápida
+                </button>
+                <button id="advanced-capture" class="btn btn-secondary">
+                    <i class="fas fa-sliders-h"></i> Captura Avançada
+                </button>
+            </div>
+        </div>
+
+        <!-- Aba Processar -->
+        <div id="tab-process" class="tab-content">
+            <div class="processing-options">
+                <h3><i class="fas fa-filter"></i> Filtros de Conteúdo</h3>
+                <div class="filter-grid">
+                    <label class="filter-option">
+                        <input type="checkbox" id="filter-ads" checked>
+                        <span class="checkmark"></span>
+                        <span>Remover anúncios</span>
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" id="filter-nav" checked>
+                        <span class="checkmark"></span>
+                        <span>Remover navegação</span>
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" id="filter-footer" checked>
+                        <span class="checkmark"></span>
+                        <span>Remover rodapé</span>
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" id="filter-sidebar" checked>
+                        <span class="checkmark"></span>
+                        <span>Remover barras laterais</span>
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" id="enhance-images" checked>
+                        <span class="checkmark"></span>
+                        <span>Otimizar imagens</span>
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" id="clean-text" checked>
+                        <span class="checkmark"></span>
+                        <span>Limpar formatação</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="ai-enhancement">
+                <h3><i class="fas fa-magic"></i> Melhorias com IA</h3>
+                <div class="enhancement-grid">
+                    <button class="enhancement-btn" id="summarize">
+                        <i class="fas fa-compress-alt"></i>
+                        <span>Resumir</span>
+                    </button>
+                    <button class="enhancement-btn" id="translate">
+                        <i class="fas fa-language"></i>
+                        <span>Traduzir</span>
+                    </button>
+                    <button class="enhancement-btn" id="extract-key">
+                        <i class="fas fa-key"></i>
+                        <span>Pontos-chave</span>
+                    </button>
+                    <button class="enhancement-btn" id="generate-toc">
+                        <i class="fas fa-list"></i>
+                        <span>Índice</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="template-selection">
+                <h3><i class="fas fa-layer-group"></i> Templates</h3>
+                <select id="template-select" class="template-dropdown">
+                    <option value="default">Padrão</option>
+                    <option value="academic">Acadêmico</option>
+                    <option value="business">Empresarial</option>
+                    <option value="report">Relatório</option>
+                    <option value="blog">Blog</option>
+                    <option value="newsletter">Newsletter</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Aba Exportar -->
+        <div id="tab-export" class="tab-content">
+            <div class="export-formats">
+                <h3><i class="fas fa-file-export"></i> Formatos de Exportação</h3>
+                <div class="format-grid">
+                    <button class="format-btn" data-format="pdf">
+                        <i class="fas fa-file-pdf"></i>
+                        <span>PDF</span>
+                        <small>Documento portátil</small>
+                    </button>
+                    <button class="format-btn" data-format="docx">
+                        <i class="fas fa-file-word"></i>
+                        <span>Word</span>
+                        <small>Microsoft Word</small>
+                    </button>
+                    <button class="format-btn" data-format="html">
+                        <i class="fas fa-code"></i>
+                        <span>HTML</span>
+                        <small>Página web</small>
+                    </button>
+                    <button class="format-btn" data-format="md">
+                        <i class="fab fa-markdown"></i>
+                        <span>Markdown</span>
+                        <small>Texto estruturado</small>
+                    </button>
+                    <button class="format-btn" data-format="epub">
+                        <i class="fas fa-book"></i>
+                        <span>EPUB</span>
+                        <small>E-book</small>
+                    </button>
+                    <button class="format-btn" data-format="json">
+                        <i class="fas fa-brackets-curly"></i>
+                        <span>JSON</span>
+                        <small>Dados estruturados</small>
+                    </button>
+                </div>
+            </div>
+
+            <div class="export-settings">
+                <h3><i class="fas fa-cog"></i> Configurações</h3>
+                <div class="settings-grid">
+                    <div class="setting-item">
+                        <label>Qualidade de imagem:</label>
+                        <select id="image-quality">
+                            <option value="low">Baixa (rápido)</option>
+                            <option value="medium" selected>Média</option>
+                            <option value="high">Alta (lento)</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label>Tamanho da página:</label>
+                        <select id="page-size">
+                            <option value="a4" selected>A4</option>
+                            <option value="letter">Letter</option>
+                            <option value="legal">Legal</option>
+                            <option value="custom">Personalizado</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label>Orientação:</label>
+                        <select id="orientation">
+                            <option value="portrait" selected>Retrato</option>
+                            <option value="landscape">Paisagem</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="export-actions">
+                <button id="preview-btn" class="btn btn-secondary">
+                    <i class="fas fa-eye"></i> Visualizar
+                </button>
+                <button id="export-btn" class="btn btn-primary">
+                    <i class="fas fa-download"></i> Exportar
+                </button>
+            </div>
+        </div>
+
+        <!-- Aba Histórico -->
+        <div id="tab-history" class="tab-content">
+            <div class="history-header">
+                <h3><i class="fas fa-history"></i> Histórico de Capturas</h3>
+                <button id="clear-history" class="btn btn-small btn-danger">
+                    <i class="fas fa-trash"></i> Limpar
+                </button>
+            </div>
+
+            <div class="history-filters">
+                <input type="text" id="history-search" placeholder="Buscar no histórico...">
+                <select id="history-filter">
+                    <option value="all">Todos</option>
+                    <option value="today">Hoje</option>
+                    <option value="week">Esta semana</option>
+                    <option value="month">Este mês</option>
+                </select>
+            </div>
+
+            <div id="history-list" class="history-list">
+                <!-- Histórico será carregado dinamicamente -->
+            </div>
+
+            <div class="history-stats">
+                <div class="stat-item">
+                    <span class="stat-label">Total de capturas:</span>
+                    <span class="stat-value" id="total-captures">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Esta semana:</span>
+                    <span class="stat-value" id="week-captures">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer com ações globais -->
+        <footer id="popup-footer">
+            <div class="footer-actions">
+                <button id="settings-btn" class="footer-btn">
+                    <i class="fas fa-cog"></i>
+                </button>
+                <button id="help-btn" class="footer-btn">
+                    <i class="fas fa-question-circle"></i>
+                </button>
+                <button id="feedback-btn" class="footer-btn">
+                    <i class="fas fa-comment"></i>
+                </button>
+            </div>
+            <div class="footer-info">
+                <span id="status-indicator">Pronto</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Overlay de loading -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <p id="loading-text">Processando...</p>
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>
