@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "AI Chat PDF Exporter",
-  "version": "1.0",
+  "version": "1.0.1",
   "description": "Exporta conversas de IAs (Claude, ChatGPT, Grok, Gemini) para PDF",
 
   "permissions": [
@@ -57,7 +57,8 @@
         "http://*/*"
       ],
       "js": ["content.js"],
-      "run_at": "document_end"
+      "run_at": "document_end",
+      "all_frames": false
     }
   ],
 
@@ -88,6 +89,7 @@
     "editor.html",
     "editor.css",
     "editor.js",
+    "ai-service.js",
     "popup.html",
     "popup.css",
     "popup.js",
